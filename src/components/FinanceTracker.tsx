@@ -7,10 +7,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { CalendarIcon, Plus, Download, LogOut, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { CalendarIcon, Plus, Download, LogOut, TrendingUp, TrendingDown, Wallet, Trash2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Transaction {
@@ -102,6 +103,53 @@ export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteTransaction = async (transactionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transactionId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await fetchTransactions();
+      toast({
+        title: "Успешно!",
+        description: "Транзакция удалена",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка",
+        description: "Не удалось удалить транзакцию",
+      });
+    }
+  };
+
+  const deleteAllTransactions = async () => {
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await fetchTransactions();
+      toast({
+        title: "Успешно!",
+        description: "Все транзакции удалены",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Ошибка",
+        description: "Не удалось удалить транзакции",
+      });
     }
   };
 
@@ -321,19 +369,43 @@ export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
             <Card className="shadow-medium">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Последние транзакции</CardTitle>
-                <Button variant="outline" onClick={exportToCSV}>
-                  <Download className="w-4 h-4 mr-2" />
-                  CSV
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={exportToCSV}>
+                    <Download className="w-4 h-4 mr-2" />
+                    CSV
+                  </Button>
+                  {transactions.length > 0 && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Очистить все
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Удалить все транзакции?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Это действие нельзя отменить. Все ваши транзакции будут безвозвратно удалены.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Отмена</AlertDialogCancel>
+                          <AlertDialogAction onClick={deleteAllTransactions}>Удалить все</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {transactions.slice(0, 10).map((transaction) => (
                     <div
                       key={transaction.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-accent"
+                      className="flex items-center justify-between p-3 rounded-lg bg-accent group"
                     >
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-foreground">
                           {transaction.category}
                         </p>
@@ -346,12 +418,37 @@ export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
                           </p>
                         )}
                       </div>
-                      <div className={cn(
-                        "font-bold",
-                        transaction.type === 'income' ? "text-income" : "text-expense"
-                      )}>
-                        {transaction.type === 'income' ? '+' : '-'}
-                        {transaction.amount.toLocaleString('ru-RU')} ₽
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "font-bold",
+                          transaction.type === 'income' ? "text-income" : "text-expense"
+                        )}>
+                          {transaction.type === 'income' ? '+' : '-'}
+                          {transaction.amount.toLocaleString('ru-RU')} ₽
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Удалить транзакцию?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Удалить транзакцию "{transaction.category}" на сумму {transaction.amount.toLocaleString('ru-RU')} ₽?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Отмена</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteTransaction(transaction.id)}>Удалить</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   ))}
