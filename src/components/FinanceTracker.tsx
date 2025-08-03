@@ -26,18 +26,6 @@ interface FinanceTrackerProps {
   user: User;
 }
 
-const categories = [
-  'Продукты',
-  'Транспорт',
-  'Развлечения',
-  'Здоровье',
-  'Одежда',
-  'Коммунальные услуги',
-  'Зарплата',
-  'Подработка',
-  'Инвестиции',
-  'Другое'
-];
 
 export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -282,21 +270,16 @@ export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
                   </Select>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Категория
-                  </label>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                 <div>
+                   <label className="text-sm font-medium text-foreground mb-2 block">
+                     Категория
+                   </label>
+                   <Input
+                     placeholder="Введите категорию..."
+                     value={category}
+                     onChange={(e) => setCategory(e.target.value)}
+                   />
+                 </div>
 
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
