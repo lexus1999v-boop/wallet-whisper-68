@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { CalendarIcon, Plus, Download, LogOut, TrendingUp, TrendingDown, Wallet, Trash2, X } from 'lucide-react';
+import { CalendarIcon, Plus, Download, LogOut, TrendingUp, TrendingDown, Wallet, Trash2, X, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Transaction {
@@ -25,10 +25,12 @@ interface Transaction {
 
 interface FinanceTrackerProps {
   user: User;
+  isAdmin: boolean;
+  onShowAdmin: () => void;
 }
 
 
-export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
+export const FinanceTracker = ({ user, isAdmin, onShowAdmin }: FinanceTrackerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [amount, setAmount] = useState('');
@@ -215,10 +217,18 @@ export const FinanceTracker = ({ user }: FinanceTrackerProps) => {
             <h1 className="text-3xl font-bold text-foreground">Твои деньги под контролем</h1>
             <p className="text-muted-foreground">Добро пожаловать, {user.email}</p>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Выйти
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button variant="outline" onClick={onShowAdmin}>
+                <Settings className="w-4 h-4 mr-2" />
+                Админ
+              </Button>
+            )}
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Выйти
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
