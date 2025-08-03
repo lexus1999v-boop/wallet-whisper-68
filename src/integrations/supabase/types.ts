@@ -47,6 +47,81 @@ export type Database = {
         }
         Relationships: []
       }
+      budgets: {
+        Row: {
+          category: string
+          created_at: string
+          end_date: string
+          id: string
+          limit_amount: number
+          period: string
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          end_date: string
+          id?: string
+          limit_amount: number
+          period: string
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          limit_amount?: number
+          period?: string
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      financial_goals: {
+        Row: {
+          category: string | null
+          created_at: string
+          current_amount: number
+          deadline: string | null
+          id: string
+          is_completed: boolean
+          target_amount: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          is_completed?: boolean
+          target_amount: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          is_completed?: boolean
+          target_amount?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

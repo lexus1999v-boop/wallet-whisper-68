@@ -13,6 +13,10 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { CalendarIcon, Plus, Download, LogOut, TrendingUp, TrendingDown, Wallet, Trash2, X, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ExpenseChart } from './ExpenseChart';
+import { FinancialGoals } from './FinancialGoals';
+import { BudgetManager } from './BudgetManager';
+import { TrendChart } from './TrendChart';
 
 interface Transaction {
   id: string;
@@ -273,6 +277,17 @@ export const FinanceTracker = ({ user, isAdmin, onShowAdmin }: FinanceTrackerPro
           </Card>
         </div>
 
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <ExpenseChart transactions={transactions} />
+          <TrendChart transactions={transactions} />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <FinancialGoals user={user} />
+          <BudgetManager user={user} transactions={transactions} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Add Transaction */}
           <div className="space-y-6">
@@ -455,17 +470,20 @@ export const FinanceTracker = ({ user, isAdmin, onShowAdmin }: FinanceTrackerPro
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Отмена</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteTransaction(transaction.id)}>Удалить</AlertDialogAction>
+                              <AlertDialogAction onClick={() => deleteTransaction(transaction.id)}>
+                                Удалить
+                              </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
                       </div>
                     </div>
                   ))}
+                  
                   {transactions.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">
-                      Пока нет транзакций. Добавьте первую!
-                    </p>
+                    <div className="text-center py-8 text-muted-foreground">
+                      Нет транзакций. Добавьте первую транзакцию!
+                    </div>
                   )}
                 </div>
               </CardContent>
